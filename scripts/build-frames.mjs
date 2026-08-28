@@ -1,16 +1,20 @@
 /**
  * Builds the hero frame sequences that FrameCanvas scrubs through.
  *
- * Two modes, chosen automatically:
+ * Three modes, in priority order, chosen automatically:
  *
- *   REAL   — if public/media/source.mp4 exists, ffmpeg extracts frames from it.
- *   SYNTH  — otherwise, frames are synthesized locally so the scroll engine can
- *            be built and verified before the footage lands. The synthetic
- *            sequence is deliberately legible: a slow push through stratified
- *            ink and gold, ancient above and engineered below.
+ *   VIDEO — public/media/source.mp4 exists: ffmpeg extracts frames from it.
+ *   PLATE — public/media/hero-plate.png (or .jpg) exists: a slow cinematic push
+ *           and drift is rendered FROM THE STILL. One painting becomes a real
+ *           scroll-driven camera move, which is most of the cinematic feeling
+ *           at none of the cost or risk of generated video — and it stays
+ *           frame-exact and reversible like any other sequence.
+ *   SYNTH — neither: abstract placeholder frames, so the scroll engine can be
+ *           built and verified before any art exists.
  *
- * Swapping placeholder for real footage is therefore one command:
- *   cp <film>.mp4 public/media/source.mp4 && npm run frames
+ * So going live is one command, whichever asset you end up with:
+ *   cp painting.png public/media/hero-plate.png && npm run frames
+ *   cp film.mp4     public/media/source.mp4     && npm run frames
  */
 import { existsSync, mkdirSync, rmSync, readdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -20,6 +24,11 @@ import sharp from "sharp";
 const ROOT = process.cwd();
 const SOURCE = path.join(ROOT, "public/media/source.mp4");
 const OUT = path.join(ROOT, "public/media/frames");
+
+/** First existing still, in preference order. */
+const PLATE = ["hero-plate.png", "hero-plate.jpg", "hero-plate.jpeg", "hero-plate.webp"]
+  .map((f) => path.join(ROOT, "public/media", f))
+  .find((f) => existsSync(f));
 
 /** Must stay in sync with FRAME_COUNTS in lib/frames.ts. */
 const PROFILES = {
@@ -114,7 +123,63 @@ async function synth(profileName, p) {
 }
 
 /* ------------------------------------------------------------------ */
-/* REAL                                                                */
+/* PLATE — a camera move rendered from one still                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Renders a slow push-in with a gentle lateral drift by cropping a shrinking
+ * window out of the source image and resizing each crop to the output size.
+ *
+ * The move is deliberately small — a 14% push over the whole sequence. A still
+ * pushed harder than that starts to reveal that it is a still: edges soften and
+ * the lack of parallax becomes obvious. Under-moving reads as a locked-off
+ * cinema camera, which is what we want.
+ */
+async function plate(profileName, p) {
+  const dir = path.join(OUT, profileName);
+  reset(dir);
+
+  const meta = await sharp(PLATE).metadata();
+  const SW = meta.width;
+  const SH = meta.height;
+  const outAspect = p.width / p.height;
+
+  // Largest window of the output's aspect ratio that fits in the source.
+  let baseW = SW;
+  let baseH = Math.round(SW / outAspect);
+  if (baseH > SH) {
+    baseH = SH;
+    baseW = Math.round(SH * outAspect);
+  }
+
+  const PUSH = 0.14; // total zoom over the sequence
+  const DRIFT = 0.05; // lateral travel, as a fraction of the slack available
+
+  for (let i = 0; i < p.count; i++) {
+    const t = p.count === 1 ? 0 : i / (p.count - 1);
+    const ease = t * t * (3 - 2 * t); // smoothstep, so the move settles at both ends
+
+    const scale = 1 - PUSH * ease;
+    const w = Math.max(2, Math.round(baseW * scale));
+    const h = Math.max(2, Math.round(baseH * scale));
+
+    // Centre the window, then drift it. Clamp so we never crop outside the image.
+    const slackX = SW - w;
+    const slackY = SH - h;
+    const left = Math.round(Math.min(slackX, Math.max(0, slackX / 2 + slackX * DRIFT * (ease - 0.5) * 2)));
+    const top = Math.round(Math.min(slackY, Math.max(0, slackY / 2 - slackY * DRIFT * (ease - 0.5))));
+
+    await sharp(PLATE)
+      .extract({ left, top, width: w, height: h })
+      .resize(p.width, p.height, { fit: "fill", kernel: "lanczos3" })
+      .webp({ quality: p.quality })
+      .toFile(path.join(dir, `${pad(i)}.webp`));
+  }
+  console.log(`  PLATE ${profileName}: ${p.count} frames @ ${p.width}x${p.height} (from ${SW}x${SH})`);
+}
+
+/* ------------------------------------------------------------------ */
+/* VIDEO                                                               */
 /* ------------------------------------------------------------------ */
 
 async function extract(profileName, p, ffmpegPath) {
@@ -165,10 +230,18 @@ async function main() {
     ffmpegPath = (await import("ffmpeg-static")).default;
   }
 
-  console.log(hasSource ? "Building frames from public/media/source.mp4" : "No source.mp4 — synthesizing placeholder frames");
+  const mode = hasSource ? "VIDEO" : PLATE ? "PLATE" : "SYNTH";
+  console.log(
+    mode === "VIDEO"
+      ? "Building frames from public/media/source.mp4"
+      : mode === "PLATE"
+        ? `Rendering a camera move from ${path.relative(ROOT, PLATE)}`
+        : "No source.mp4 or hero-plate — synthesizing placeholder frames"
+  );
 
   for (const [name, p] of Object.entries(PROFILES)) {
-    if (hasSource) await extract(name, p, ffmpegPath);
+    if (mode === "VIDEO") await extract(name, p, ffmpegPath);
+    else if (mode === "PLATE") await plate(name, p);
     else await synth(name, p);
   }
   console.log("Done.");

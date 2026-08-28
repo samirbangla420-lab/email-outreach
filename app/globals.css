@@ -6,29 +6,37 @@
    ============================================================ */
 
 @theme {
-  /* --- Ground: ink --- */
-  --color-ink-950: #08070a;
-  --color-ink-900: #0e0d11;
-  --color-ink-800: #16151a;
-  --color-ink-700: #201e26;
+  /* --- Ground: twilight ----------------------------------------------
+     Not pure black. The hero is a blue-hour painting, and a neutral #08070A
+     ground reads as a hole punched behind it — the image looks like it is
+     sitting on the page rather than continuing off it. These carry a slight
+     teal-indigo cast so the page reads as the same twilight, extended. */
+  --color-ink-950: #07090f;
+  --color-ink-900: #0b0e16;
+  --color-ink-800: #12161f;
+  --color-ink-700: #1b2130;
 
-  /* --- Type: bone --- */
-  --color-bone-100: #efe9dd;
-  --color-bone-300: #c9c0ae;
-  --color-bone-500: #8d8677;
+  /* --- Type: bone ---
+     Warmed very slightly. Warm type on a cool ground is what stops a dark
+     blue palette going cold and corporate. */
+  --color-bone-100: #f0ebe0;
+  --color-bone-300: #c7c1b3;
+  --color-bone-500: #8a8578;
 
-  /* --- Accent: leaf gold --- */
-  --color-gold-500: #c9a227;
-  --color-gold-300: #e4c767;
+  /* --- Accent: leaf gold ---
+     The warm break on the horizon, brought into the interface. */
+  --color-gold-500: #cca42b;
+  --color-gold-300: #e8cd72;
 
-  /* --- The single cool classical note --- */
-  --color-patina: #3e5c55;
+  /* --- Oxidised bronze, the mid-tone between gold and blue --- */
+  --color-patina: #3c6058;
 
-  /* The modern-tech voice, used <= 3 times on the page.
-     Ultramarine rather than a screen blue: lapis lazuli was the costliest
-     pigment of the Renaissance, so this reads as both the oldest luxury and
-     the newest signal. That double reading is the entire thesis in one hue. */
-  --color-signal: #3a54de;
+  /* The modern-tech voice. Ultramarine — lapis lazuli was the costliest
+     pigment of the Renaissance, so it reads as both the oldest luxury and the
+     newest signal. With a blue-hour hero this is no longer an accent sitting
+     on top of the palette; it is the palette's own colour, so it can now be
+     used with less restraint than the original three-appearance rule. */
+  --color-signal: #4763e8;
 
   --font-display: var(--font-bodoni), "Didot", "Times New Roman", serif;
   --font-monument: var(--font-cinzel), "Trajan Pro", Georgia, serif;
