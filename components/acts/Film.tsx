@@ -31,6 +31,7 @@ export default function Film() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const progressRef = useRef(0);
   const timecodeRef = useRef<HTMLSpanElement | null>(null);
+  const scrimRef = useRef<HTMLDivElement | null>(null);
   const beatRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const profile: FrameProfile | null = ready ? (coarse ? "mobile" : "desktop") : null;
@@ -58,6 +59,7 @@ export default function Film() {
     // stacked text. The story is still fully readable with zero movement.
     if (reduced) {
       progressRef.current = 0.5;
+      if (scrimRef.current) gsap.set(scrimRef.current, { opacity: 1 });
       beatRefs.current.forEach((el) => {
         if (el) gsap.set(el, { opacity: 1, clipPath: "inset(0% 0% 0% 0%)", y: 0 });
       });
@@ -112,6 +114,16 @@ export default function Film() {
             i + 0.70
           )
           .to(el, { opacity: 0, duration: 0.04, ease: "none" }, i + 0.93);
+
+        // The scrim rides with the text, not with the section. A fixed overlay
+        // strong enough to carry white type over a luminous blue-hour painting
+        // would flatten the painting for the whole pin; this way the image is
+        // seen at full strength in the silence between beats and is only
+        // damped while there are actually words on top of it.
+        if (scrimRef.current) {
+          tl.to(scrimRef.current, { opacity: 1, duration: 0.3, ease: "power2.out" }, i)
+            .to(scrimRef.current, { opacity: 0, duration: 0.3, ease: "power2.in" }, i + 0.7);
+        }
       });
 
       // Guarantee the timeline spans every beat's full unit.
@@ -136,6 +148,18 @@ export default function Film() {
         className={`absolute inset-0 h-full w-full transition-opacity duration-1000 ${
           loaded ? "opacity-100" : "opacity-0"
         }`}
+      />
+
+      {/* Legibility scrim, driven by the beat timeline above. Sits between the
+          canvas and the type. Weighted to the left, where the lines begin. */}
+      <div
+        ref={scrimRef}
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-[3] opacity-0"
+        style={{
+          background:
+            "linear-gradient(100deg, rgba(7,9,15,0.82) 0%, rgba(7,9,15,0.66) 38%, rgba(7,9,15,0.22) 72%, rgba(7,9,15,0.05) 100%)",
+        }}
       />
 
       {/* Beats. Real text in the DOM at all times — crawlers and no-JS readers
