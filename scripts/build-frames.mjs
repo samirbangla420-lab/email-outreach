@@ -22,12 +22,26 @@ import path from "node:path";
 import sharp from "sharp";
 
 const ROOT = process.cwd();
-const SOURCE = path.join(ROOT, "public/media/source.mp4");
+const MEDIA = path.join(ROOT, "public/media");
+
+/**
+ * Any video dropped in public/media counts, whatever it is called. Requiring an
+ * exact filename means an upload that lands as
+ * "hf_20260828_023920_1379faab….mp4" silently builds a site with no hero, and
+ * the person who uploaded it has no way to tell.
+ */
+const SOURCE = (() => {
+  if (!existsSync(MEDIA)) return null;
+  const vid = readdirSync(MEDIA)
+    .filter((f) => /\.(mp4|mov|webm|m4v)$/i.test(f))
+    .sort();
+  return vid.length ? path.join(MEDIA, vid[0]) : null;
+})();
 const OUT = path.join(ROOT, "public/media/frames");
 
 /** First existing still, in preference order. */
 const PLATE = ["hero-plate.png", "hero-plate.jpg", "hero-plate.jpeg", "hero-plate.webp"]
-  .map((f) => path.join(ROOT, "public/media", f))
+  .map((f) => path.join(MEDIA, f))
   .find((f) => existsSync(f));
 
 /** Must stay in sync with FRAME_COUNTS in lib/frames.ts. */
@@ -188,42 +202,42 @@ async function extract(profileName, p, ffmpegPath) {
   const tmp = path.join(ROOT, "scripts/.work", `frames-${profileName}`);
   reset(tmp);
 
-  // Probe duration so we can request exactly `count` evenly spaced frames.
-  const dur = Number(
-    execFileSync(ffmpegPath, ["-i", SOURCE, "-hide_banner"], {
-      stdio: ["ignore", "pipe", "pipe"],
-    }).toString() || 0
-  );
-
-  // fps filter with an explicit output frame count is the reliable way to get
-  // a fixed-length sequence regardless of source framerate.
+  // Decode every frame straight to the output size as JPEG. Probing duration
+  // first is tempting but `ffmpeg -i` reports to stderr and exits non-zero, so
+  // it throws rather than returning a number; decoding everything and then
+  // sampling evenly is both simpler and exact, and JPEG at the target size
+  // keeps the intermediate small enough for the session disk allowance.
   execFileSync(
     ffmpegPath,
     [
-      "-y", "-i", SOURCE,
+      "-y", "-loglevel", "error", "-i", SOURCE,
       "-vf", `scale=${p.width}:${p.height}:force_original_aspect_ratio=increase,crop=${p.width}:${p.height}`,
-      "-frames:v", String(p.count),
-      "-vsync", "0",
-      path.join(tmp, "%04d.png"),
+      "-q:v", "3",
+      path.join(tmp, "%05d.jpg"),
     ],
-    { stdio: "ignore" }
+    { stdio: ["ignore", "ignore", "pipe"] }
   );
 
-  const files = readdirSync(tmp).sort();
-  for (let i = 0; i < Math.min(files.length, p.count); i++) {
-    await sharp(path.join(tmp, files[i]))
+  const decoded = readdirSync(tmp).sort();
+  if (!decoded.length) throw new Error(`ffmpeg produced no frames from ${SOURCE}`);
+
+  // Map the p.count output slots evenly across whatever was decoded, so the
+  // sequence always spans the full clip regardless of its framerate or length.
+  for (let i = 0; i < p.count; i++) {
+    const src = decoded[Math.min(decoded.length - 1, Math.round((i / (p.count - 1)) * (decoded.length - 1)))];
+    await sharp(path.join(tmp, src))
       .webp({ quality: p.quality })
       .toFile(path.join(dir, `${pad(i)}.webp`));
   }
   rmSync(tmp, { recursive: true, force: true });
-  console.log(`  REAL  ${profileName}: ${Math.min(files.length, p.count)} frames @ ${p.width}x${p.height} (source ${dur || "?"}s)`);
+  console.log(`  VIDEO ${profileName}: ${p.count} frames @ ${p.width}x${p.height} (sampled from ${decoded.length} decoded)`);
 }
 
 /* ------------------------------------------------------------------ */
 
 async function main() {
   mkdirSync(OUT, { recursive: true });
-  const hasSource = existsSync(SOURCE);
+  const hasSource = Boolean(SOURCE);
 
   let ffmpegPath = null;
   if (hasSource) {
@@ -233,10 +247,10 @@ async function main() {
   const mode = hasSource ? "VIDEO" : PLATE ? "PLATE" : "SYNTH";
   console.log(
     mode === "VIDEO"
-      ? "Building frames from public/media/source.mp4"
+      ? `Building frames from ${path.relative(ROOT, SOURCE)}`
       : mode === "PLATE"
         ? `Rendering a camera move from ${path.relative(ROOT, PLATE)}`
-        : "No source.mp4 or hero-plate — synthesizing placeholder frames"
+        : "No video or hero-plate in public/media — synthesizing placeholder frames"
   );
 
   for (const [name, p] of Object.entries(PROFILES)) {

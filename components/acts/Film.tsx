@@ -158,15 +158,25 @@ export default function Film() {
         className="pointer-events-none absolute inset-0 z-[3] opacity-0"
         style={{
           background:
-            "linear-gradient(100deg, rgba(7,9,15,0.82) 0%, rgba(7,9,15,0.66) 38%, rgba(7,9,15,0.22) 72%, rgba(7,9,15,0.05) 100%)",
+            "radial-gradient(75% 65% at 18% 82%, rgba(7,9,15,0.90) 0%, rgba(7,9,15,0.72) 42%, rgba(7,9,15,0.28) 72%, rgba(7,9,15,0) 100%)",
         }}
       />
 
       {/* Beats. Real text in the DOM at all times — crawlers and no-JS readers
           get the full sequence; only the motion is client-side. */}
-      <div className="pointer-events-none absolute inset-0 z-[4] flex items-center">
-        <div className="w-full px-[var(--gutter)]">
-          <div className="relative mx-auto max-w-[68rem]">
+      {/* The type sits low and left, not centred.
+          The painting's focal point is the pair of almost-touching hands at
+          the middle of the frame; centred lines ran straight across them and
+          across the young man's face. The dark desert-and-city band at lower
+          left is the composition's one genuinely quiet passage, so the words
+          live there and the picture keeps its best moment. */}
+      <div className="pointer-events-none absolute inset-0 z-[4] flex items-end">
+        <div className="w-full px-[var(--gutter)] pb-[clamp(5rem,14vh,9rem)]">
+          {/* 52vw is a sensible column on a landscape frame and far too narrow
+              on a portrait one, where it forces a ragged four-line wrap. The
+              mobile crop puts the figures up top and leaves the lower band
+              clear, so the measure can run much wider there. */}
+          <div className="relative max-w-[90vw] sm:max-w-[min(46rem,52vw)]">
             {beats.map((beat, i) => (
               <div
                 key={beat.id}
