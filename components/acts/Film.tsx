@@ -138,8 +138,9 @@ export default function Film() {
   return (
     <section
       ref={sectionRef}
+      data-sc-act="film"
       className="relative h-[100svh] w-full overflow-hidden bg-ink-950 grain vignette"
-      aria-label="Alchemy and Waves — opening sequence"
+      aria-label="Alchemy and Waves, opening sequence"
     >
       <FrameCanvas
         profile={profile ?? "desktop"}
@@ -184,6 +185,7 @@ export default function Film() {
                   beatRefs.current[i] = el;
                 }}
                 data-beat={beat.id}
+                data-sc-cue=""
                 className={i === 0 ? "relative" : "absolute inset-x-0 top-0"}
               >
                 <h1 className="t-display text-bone-100">

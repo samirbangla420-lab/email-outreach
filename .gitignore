@@ -17,3 +17,4 @@ CLAUDE.md
 # NOTE: the hero SOURCE assets (hero-plate.* and source.mp4) are deliberately
 # NOT ignored. They are the only inputs the frame builder cannot regenerate, so
 # a deploy that lacks them has no hero at all. Commit them.
+/lab

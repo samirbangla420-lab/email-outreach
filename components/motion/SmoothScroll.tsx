@@ -30,6 +30,10 @@ export default function SmoothScroll() {
 
     gsap.registerPlugin(ScrollTrigger);
 
+    // The scrollcraft verification harness waits on this before shooting, so
+    // it can never catch the page mid-load. Set once, after layout settles.
+    requestAnimationFrame(() => document.documentElement.classList.add("sc-ready"));
+
     if (reduced || coarse) {
       ScrollTrigger.refresh();
       return;

@@ -50,11 +50,11 @@ export default function Thesis() {
   return (
     <section
       ref={ref}
+      data-sc-act="thesis"
       className="relative bg-ink-950 px-[var(--gutter)] py-[clamp(7rem,18vh,14rem)]"
     >
       <div className="mx-auto max-w-[72rem]">
-        <p className="t-meta mb-[clamp(2.5rem,6vh,4.5rem)]">{THESIS.eyebrow}</p>
-        <p className="t-display-sm text-bone-100">
+        <p className="t-display-sm text-bone-100" data-sc-copy="">
           {THESIS.statement.split(" ").map((w, i) => (
             <span key={i} className="th-word inline-block">
               {w}

@@ -192,3 +192,91 @@ body {
     clip-path: none !important;
   }
 }
+
+/* ============================================================
+   THE SIGNATURE MOVE — "the seam takes a side"
+   One value, --bias (-1 ancient .. +1 engineered), set by the pointer on
+   desktop and by scroll progress on touch. Everything below reads it, so the
+   whole act moves as one thing rather than as a pile of separate effects.
+   Only transform, opacity and colour are driven; nothing here triggers layout.
+   ============================================================ */
+
+.seam-stage {
+  --bias: 0;
+  /* Clamped halves, so each side can be weighted without the other going
+     negative. Sign-free maths keeps the CSS readable. */
+  --warm: max(0, calc(var(--bias) * -1));
+  --cool: max(0, var(--bias));
+}
+
+/* The ground. Warms toward the desert, cools toward the built world. */
+.seam-wash {
+  position: absolute;
+  inset: -12% -8%;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(60% 70% at calc(28% - var(--bias) * 14%) 50%,
+      color-mix(in oklab, var(--color-gold-500) 26%, transparent) 0%, transparent 68%),
+    radial-gradient(60% 70% at calc(72% - var(--bias) * 14%) 50%,
+      color-mix(in oklab, var(--color-signal) 26%, transparent) 0%, transparent 68%);
+  opacity: calc(0.22 + (var(--warm) + var(--cool)) * 0.5);
+  filter: blur(38px);
+  transform: translate3d(calc(var(--bias) * 1.4%), 0, 0);
+}
+
+/* The two words trade weight. Whichever side you lean to speaks up; the other
+   recedes but never disappears, because the point is the tension between them. */
+.seam-word {
+  position: relative;
+  z-index: 1;
+  transition: none;
+  will-change: transform, opacity;
+}
+.seam-word-a {
+  color: color-mix(in oklab, var(--color-bone-100) calc(70% + var(--warm) * 30%), var(--color-gold-500));
+  opacity: calc(0.62 + var(--warm) * 0.38);
+  transform: translate3d(calc(var(--warm) * 1.2rem), 0, 0);
+}
+.seam-word-b {
+  color: color-mix(in oklab, var(--color-signal) calc(60% + var(--cool) * 40%), var(--color-bone-300));
+  opacity: calc(0.62 + var(--cool) * 0.38);
+  transform: translate3d(calc(var(--cool) * -1.2rem), 0, 0);
+}
+
+/* The rule re-weights its own gradient toward whichever world is winning. */
+.seam-rule {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-gold-500) calc(18% - var(--bias) * 8%),
+    var(--color-gold-300) calc(50% - var(--bias) * 10%),
+    var(--color-signal) calc(82% - var(--bias) * 8%),
+    transparent
+  );
+}
+
+/* The light in the seam follows the cursor. This is the tell that the page is
+   responding to the person rather than to the wheel. */
+.seam-spark {
+  position: absolute;
+  top: 50%;
+  left: calc(50% + var(--bias) * 46%);
+  width: clamp(7rem, 22vw, 16rem);
+  height: 2px;
+  transform: translate3d(-50%, -50%, 0);
+  pointer-events: none;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--color-gold-300) calc(55% + var(--warm) * 45%), var(--color-signal)) 0%,
+    transparent 100%
+  );
+  filter: blur(0.5px);
+  opacity: 0.9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seam-wash { opacity: 0.22; transform: none; }
+  .seam-word-a, .seam-word-b { transform: none; opacity: 1; }
+  .seam-spark { left: 50%; }
+}

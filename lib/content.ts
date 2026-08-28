@@ -40,12 +40,12 @@ export const FILM_BEATS = [
   },
   {
     id: "beat-3",
-    lines: ["Alchemy & Waves", "builds at the seam —"],
+    lines: ["Alchemy & Waves", "builds at the seam,"],
     mobile: true,
   },
   {
     id: "beat-4",
-    lines: ["— where old knowledge", "meets new machinery."],
+    lines: ["where old knowledge", "meets new machinery."],
     mobile: true,
   },
 ] as const;
@@ -54,7 +54,7 @@ export const THESIS = {
   eyebrow: "The Group",
   // Rendered word-by-word on a scroll-linked opacity ramp.
   statement:
-    "We are a holding group. We take what is already known, and we give it new machinery. Nothing here is invented from nothing — it is inherited, understood, and rebuilt for the century it now has to survive.",
+    "We are a holding group. We take what is already known, and we give it new machinery. Nothing here is invented from nothing. It is inherited, understood, and rebuilt for the century it now has to survive.",
   footnote: "Established as a private group. Held for the long horizon.",
 } as const;
 
@@ -65,7 +65,7 @@ export const PILLARS = [
     // Provenance is the art world's term for an artwork's chain of ownership,
     // and the natural word for a holding group's origination of capital.
     lede: "What we inherit, and where it came from.",
-    body: "Every asset arrives with a history. We buy, build and back only what we can trace — the origin of the capital, the origin of the idea, the origin of the advantage. An unexamined inheritance is a liability wearing the costume of an asset.",
+    body: "Every asset arrives with a history. We buy, build and back only what we can trace: the origin of the capital, the origin of the idea, the origin of the advantage. An unexamined inheritance is a liability wearing the costume of an asset.",
     meta: ["Origination", "Diligence", "Long-horizon capital"],
   },
   {
@@ -79,7 +79,7 @@ export const PILLARS = [
     numeral: "III",
     name: "Current",
     lede: "How it travels.",
-    body: "Value that cannot move is value that decays. The third discipline is distribution — the networks, channels and momentum that carry a built thing to the people it was built for. A wave is only water until it reaches a shore.",
+    body: "Value that cannot move is value that decays. The third discipline is distribution. Networks, channels and momentum carry a built thing to the people it was built for. A wave is only water until it reaches a shore.",
     meta: ["Distribution", "Networks", "Reach"],
   },
 ] as const;

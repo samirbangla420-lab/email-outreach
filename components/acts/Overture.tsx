@@ -91,7 +91,7 @@ export default function Overture() {
       </div>
       <div className="mt-6 overflow-hidden">
         <span className="ov-line t-meta block translate-y-full">
-          <span ref={countRef}>000</span> — {COMPANY.founded}
+          <span ref={countRef}>000</span> / {COMPANY.founded}
         </span>
       </div>
     </div>

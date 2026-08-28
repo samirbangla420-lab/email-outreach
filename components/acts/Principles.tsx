@@ -50,7 +50,8 @@ export default function Principles() {
   return (
     <section
       ref={ref}
-      className="relative bg-ink-900 px-[var(--gutter)] py-[clamp(6rem,16vh,12rem)]"
+      data-sc-act="principles"
+      className="relative bg-ink-900 px-[var(--gutter)] py-[clamp(5rem,12vh,9rem)]"
     >
       <div className="mx-auto max-w-[80rem]">
         <p className="t-meta mb-[clamp(3rem,8vh,5rem)]">{PRINCIPLES.eyebrow}</p>
@@ -64,15 +65,14 @@ export default function Principles() {
                 aria-hidden="true"
               />
               <div className="grid grid-cols-12 gap-x-6 gap-y-3">
-                <span className="t-meta col-span-12 text-gold-500 sm:col-span-2">{item.n}</span>
-                <h3 className="col-span-12 sm:col-span-5">
+                <h3 className="col-span-12 sm:col-span-6">
                   <span className="line-mask">
                     <span className="line-inner t-display-sm block text-[clamp(1.25rem,2.2vw,1.9rem)] text-bone-100">
                       {item.title}
                     </span>
                   </span>
                 </h3>
-                <p className="t-body col-span-12 sm:col-span-5">{item.body}</p>
+                <p className="t-body col-span-12 sm:col-span-5 sm:col-start-8">{item.body}</p>
               </div>
             </li>
           ))}

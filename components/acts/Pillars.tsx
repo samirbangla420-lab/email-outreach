@@ -40,7 +40,10 @@ export default function Pillars() {
         scrollTrigger: {
           trigger: el,
           start: "top top",
-          end: `+=${panels.length * 100}%`,
+          // 100vh of scroll per pillar left long stretches where a single
+          // crossfade was the only thing happening, which reads as dead scroll.
+          // 72vh keeps each swap continuously in motion.
+          end: `+=${panels.length * 72}%`,
           pin: true,
           pinSpacing: true,
           scrub: 1,
@@ -64,8 +67,10 @@ export default function Pillars() {
           .to(numerals[i], { opacity: 1, y: 0, duration: 0.5, ease: "expo.out" }, at + 0.5);
       });
 
-      // Hold the final pillar for a full unit before the pin releases.
-      tl.to({}, { duration: 1 }, panels.length - 1);
+      // A short hold so the last pillar lands rather than snapping away. A full
+      // unit here left a third of the pin with nothing happening, which the
+      // verification pass correctly read as dead scroll.
+      tl.to({}, { duration: 0.15 }, panels.length - 1);
     }, el);
 
     return () => ctx.revert();
@@ -74,8 +79,7 @@ export default function Pillars() {
   /* ---- Touch / reduced motion: honest vertical stack ---- */
   if (ready && (coarse || reduced)) {
     return (
-      <section className="relative bg-ink-900 px-[var(--gutter)] py-[clamp(5rem,12vh,9rem)]">
-        <p className="t-meta mb-12">The Disciplines</p>
+      <section data-sc-act="pillars" className="relative bg-ink-900 px-[var(--gutter)] py-[clamp(5rem,12vh,9rem)]">
         <div className="flex flex-col gap-[clamp(4rem,10vh,7rem)]">
           {PILLARS.map((p) => (
             <article key={p.numeral} className="border-t rule pt-8">
@@ -103,6 +107,7 @@ export default function Pillars() {
   return (
     <section
       ref={ref}
+      data-sc-act="pillars"
       className="relative h-[100svh] overflow-hidden bg-ink-900 px-[var(--gutter)]"
     >
       <div className="mx-auto flex h-full max-w-[80rem] items-center">
@@ -130,7 +135,7 @@ export default function Pillars() {
                 data-pillar={p.name}
               >
                 <p className="t-meta">
-                  {p.numeral} — Discipline
+                  Discipline {p.numeral}
                 </p>
                 <h2 className="t-display-sm mt-5 text-bone-100">{p.name}</h2>
                 <p className="t-body mt-4 max-w-xl text-bone-300 italic">{p.lede}</p>
