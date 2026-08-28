@@ -69,7 +69,7 @@ function synthFrame(t, w, h) {
   for (let i = 0; i < 7; i++) {
     const y = horizon - (i + 1) * (horizon / 8) - ease * 14 * (i + 1);
     const o = 0.05 + i * 0.012;
-    strata += `<rect x="0" y="${y.toFixed(1)}" width="${w}" height="1.4" fill="#C9A227" opacity="${o.toFixed(3)}"/>`;
+    strata += `<rect x="0" y="${y.toFixed(1)}" width="${w}" height="1.4" fill="#CCA42B" opacity="${o.toFixed(3)}"/>`;
   }
 
   // Lattice below the horizon (the modern machinery).
@@ -79,34 +79,34 @@ function synthFrame(t, w, h) {
     const x = (i / cols) * w;
     // Verticals converge toward the vanishing point as we push in.
     const x2 = cx + (x - cx) * (1 - ease * 0.34);
-    lattice += `<line x1="${x.toFixed(1)}" y1="${h}" x2="${x2.toFixed(1)}" y2="${horizon.toFixed(1)}" stroke="#3E5C55" stroke-width="1" opacity="${(0.22 + ease * 0.16).toFixed(3)}"/>`;
+    lattice += `<line x1="${x.toFixed(1)}" y1="${h}" x2="${x2.toFixed(1)}" y2="${horizon.toFixed(1)}" stroke="#3C6058" stroke-width="1" opacity="${(0.22 + ease * 0.16).toFixed(3)}"/>`;
   }
   for (let i = 1; i < 7; i++) {
     const y = horizon + ((h - horizon) * i) / 7;
-    lattice += `<line x1="0" y1="${y.toFixed(1)}" x2="${w}" y2="${y.toFixed(1)}" stroke="#3E5C55" stroke-width="0.8" opacity="${(0.1 + ease * 0.08).toFixed(3)}"/>`;
+    lattice += `<line x1="0" y1="${y.toFixed(1)}" x2="${w}" y2="${y.toFixed(1)}" stroke="#3C6058" stroke-width="0.8" opacity="${(0.1 + ease * 0.08).toFixed(3)}"/>`;
   }
 
   return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
   <defs>
     <radialGradient id="core" cx="${(cx / w).toFixed(4)}" cy="${(cy / h).toFixed(4)}" r="${(coreR / w).toFixed(4)}">
-      <stop offset="0%" stop-color="#E4C767" stop-opacity="${coreO.toFixed(3)}"/>
-      <stop offset="55%" stop-color="#C9A227" stop-opacity="${(coreO * 0.32).toFixed(3)}"/>
-      <stop offset="100%" stop-color="#08070A" stop-opacity="0"/>
+      <stop offset="0%" stop-color="#E8CD72" stop-opacity="${coreO.toFixed(3)}"/>
+      <stop offset="55%" stop-color="#CCA42B" stop-opacity="${(coreO * 0.32).toFixed(3)}"/>
+      <stop offset="100%" stop-color="#07090F" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#0E0D11"/>
-      <stop offset="${((horizon / h) * 100).toFixed(1)}%" stop-color="#16151A"/>
-      <stop offset="100%" stop-color="#08070A"/>
+      <stop offset="0%" stop-color="#070910"/>
+      <stop offset="${((horizon / h) * 100).toFixed(1)}%" stop-color="#132330"/>
+      <stop offset="100%" stop-color="#0B0E16"/>
     </linearGradient>
   </defs>
   <rect width="${w}" height="${h}" fill="url(#ground)"/>
   <g transform="translate(${(w / 2).toFixed(1)} ${(h / 2).toFixed(1)}) scale(${scale.toFixed(4)}) translate(${(-w / 2).toFixed(1)} ${(-h / 2).toFixed(1)})">
     ${strata}
     ${lattice}
-    <rect x="0" y="${horizon.toFixed(1)}" width="${w}" height="1.6" fill="#C9A227" opacity="${(0.4 + ease * 0.35).toFixed(3)}"/>
+    <rect x="0" y="${horizon.toFixed(1)}" width="${w}" height="1.6" fill="#CCA42B" opacity="${(0.4 + ease * 0.35).toFixed(3)}"/>
   </g>
   <rect width="${w}" height="${h}" fill="url(#core)"/>
-  <rect width="${w}" height="${h}" fill="#08070A" opacity="${(0.3 - ease * 0.16).toFixed(3)}"/>
+  <rect width="${w}" height="${h}" fill="#07090F" opacity="${(0.3 - ease * 0.16).toFixed(3)}"/>
 </svg>`);
 }
 
