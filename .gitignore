@@ -1,0 +1,4 @@
+# Agent skills installed via `npx skills add` (see skills-lock.json).
+# Vendored trees are regenerated on install, not checked in.
+.agents/skills/
+.claude/skills/
