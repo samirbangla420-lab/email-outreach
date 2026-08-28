@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- The seam: an inherited circle, an engineered line, gold where they meet. -->
+  <rect width="64" height="64" fill="#08070A"/>
+  <circle cx="32" cy="32" r="19" fill="none" stroke="#C9A227" stroke-width="2.5"/>
+  <path d="M32 15 L45 44 L19 44 Z" fill="none" stroke="#C9A227" stroke-width="2" opacity="0.55"/>
+  <line x1="9" y1="32" x2="55" y2="32" stroke="#E4C767" stroke-width="2.5"/>
+</svg>

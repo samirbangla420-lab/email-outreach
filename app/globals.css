@@ -1,0 +1,184 @@
+@import "tailwindcss";
+
+/* ============================================================
+   ALCHEMY & WAVES — "THE SEAM"
+   Design tokens. Ancient knowledge above, modern machinery below.
+   ============================================================ */
+
+@theme {
+  /* --- Ground: ink --- */
+  --color-ink-950: #08070a;
+  --color-ink-900: #0e0d11;
+  --color-ink-800: #16151a;
+  --color-ink-700: #201e26;
+
+  /* --- Type: bone --- */
+  --color-bone-100: #efe9dd;
+  --color-bone-300: #c9c0ae;
+  --color-bone-500: #8d8677;
+
+  /* --- Accent: leaf gold --- */
+  --color-gold-500: #c9a227;
+  --color-gold-300: #e4c767;
+
+  /* --- The single cool classical note --- */
+  --color-patina: #3e5c55;
+
+  /* The modern-tech voice, used <= 3 times on the page.
+     Ultramarine rather than a screen blue: lapis lazuli was the costliest
+     pigment of the Renaissance, so this reads as both the oldest luxury and
+     the newest signal. That double reading is the entire thesis in one hue. */
+  --color-signal: #3a54de;
+
+  --font-display: var(--font-bodoni), "Didot", "Times New Roman", serif;
+  --font-monument: var(--font-cinzel), "Trajan Pro", Georgia, serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", monospace;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Motion: ONE easing family. No bounce, no elastic, ever. */
+  --ease-seam: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+
+:root {
+  --gutter: clamp(1.25rem, 5vw, 6rem);
+  --rule: color-mix(in oklab, var(--color-bone-100) 14%, transparent);
+  color-scheme: dark;
+}
+
+* { min-width: 0; }
+
+html {
+  background: var(--color-ink-950);
+  /* Lenis drives scrolling on desktop; never let the two fight. */
+  scroll-behavior: auto;
+}
+
+body {
+  background: var(--color-ink-950);
+  color: var(--color-bone-100);
+  font-family: var(--font-body);
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--color-gold-500);
+  color: var(--color-ink-950);
+}
+
+/* ============================================================
+   Type ladder — a fixed ratio, clamped at every step
+   ============================================================ */
+
+.t-monument {
+  font-family: var(--font-monument);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 0.95;
+}
+
+.t-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-optical-sizing: auto;
+  letter-spacing: -0.025em;
+  line-height: 0.98;
+  font-size: clamp(2.75rem, 7vw, 8rem);
+}
+
+.t-display-sm {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.06;
+  font-size: clamp(1.85rem, 4vw, 3.75rem);
+}
+
+.t-meta {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: clamp(0.625rem, 0.85vw, 0.75rem);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-bone-500);
+  font-variant-numeric: tabular-nums;
+}
+
+.t-body {
+  font-family: var(--font-body);
+  font-size: clamp(0.95rem, 1.1vw, 1.075rem);
+  line-height: 1.65;
+  letter-spacing: 0.004em;
+  color: var(--color-bone-300);
+}
+
+/* ============================================================
+   Masked line reveal — the ONLY entrance mechanic for text.
+   No opacity-only fades anywhere on this site.
+   ============================================================ */
+
+.line-mask {
+  overflow: hidden;
+  display: block;
+  /* Descenders get clipped by overflow:hidden without this breathing room. */
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+
+.line-inner {
+  display: block;
+  will-change: transform;
+}
+
+/* ============================================================
+   Texture — fresco grain + vignette.
+   Static, never animated: animated grain is a mobile battery sink.
+   ============================================================ */
+
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0.042;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (max-width: 768px) {
+  .grain::after { opacity: 0.028; }
+}
+
+.vignette::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background:
+    radial-gradient(120% 85% at 50% 45%, transparent 30%, rgba(8, 7, 10, 0.55) 78%, rgba(8, 7, 10, 0.92) 100%);
+}
+
+.rule { border-color: var(--rule); }
+
+/* ============================================================
+   Reduced motion: everything resolves to its end state.
+   The page must be fully readable with zero motion.
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .line-inner { transform: none !important; }
+  .line-mask { overflow: visible; }
+  [data-motion] {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+}
